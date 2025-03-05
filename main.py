@@ -13,24 +13,31 @@ load_dotenv()
 TS  = time.time()
 PUBLIC_KEY = os.getenv('PUBLIC_KEY')
 PRIVATE_KEY = os.getenv('PRIVATE_KEY')
-HASH = hashlib.md5(f'{TS}{PRIVATE_KEY}{PUBLIC_KEY}') # encrypt the hash
+HASH = hashlib.md5(f'{TS}{PRIVATE_KEY}{PUBLIC_KEY}'.encode()).hexdigest() # encrypt the hash
 
-marvel = Marvel(PUBLIC_KEY= PUBLIC_KEY,
-                PRIVATE_KEY= PRIVATE_KEY)
 
 # example of an authenticated url request 
 # http://gateway.marvel.com/v1/public/comics?ts=1&apikey=1234&hash=ffd275c5130566a2916217b101f26150
 
+# construct a url
+base_url = 'https://gateway.marvel.com/v1/public/comics'
+# add params
+params = {
+    'titleStartsWith' : 'Avengers',
+    'startYear' : 2012,
+    'limit' : 50,
+    'apikey' : HASH,
+    'ts' : TS,
+}
+
+response = requests.get(base_url, params=params)
+data = response.json()
+
+print (data)
 
 
 # TESTING GRAVEYARD
 
-# print(f"Pub Key: {PUBLIC_KEY}")
+# for comic in data["data"]["results"]: 
+#     print(comic["title"])
 
-# characters = marvel.characters
-# all_characters = marvel.characters.all()
-# print(all_characters)
-
-# comics = marvel.comics
-# all_comics = comics.all()
-# print(all_comics)
